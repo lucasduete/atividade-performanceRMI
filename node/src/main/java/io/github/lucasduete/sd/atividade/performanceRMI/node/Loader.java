@@ -16,7 +16,7 @@ import java.util.concurrent.BlockingQueue;
 
 public class Loader {
 
-    private static Integer id;
+    private static Integer jump = 0;
     private static Long startedMilli;
 
     private static final String sqlInsert = "INSERT INTO Table_1(Id, Nome) VALUES (?,?);";
@@ -62,9 +62,8 @@ public class Loader {
                 if (ex.getMessage().toLowerCase().contains("duplicate key value violates unique constraint")) {
                     synchronized (salt) {
                         if (!hasSalted()) {
-                            int jump = new Random().nextInt(250);
+                            jump = new Random().nextInt(250);
                             System.out.println("jump " + jump);
-                            id += jump;
                             salted();
                         }
                     }
@@ -144,7 +143,7 @@ public class Loader {
         restoreDelete.start();
 
         while (getDoContinue()) {
-            queueInsert.put(identify.getIdentity());
+            queueInsert.put(jump + identify.getIdentity());
 
             new Thread(insertion).start();
             new Thread(updation).start();
